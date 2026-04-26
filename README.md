@@ -1,32 +1,40 @@
-he app-arm64-v8a-release.apk is the primary "flagship" build for your project, it deserves a technical breakdown that explains why it is the superior choice for your Redmi 13C and other modern devices.
+🛡️ Blockify v1.0:
+An ultra-reliable, system-level ad-nuke engine for Spotify, engineered specifically for HyperOS and MIUI devices.
 
-Here is a detailed description you can use in the Assets section or the Release Notes on GitHub:
+Unlike standard ad-muters that just turn down the volume, Blockify uses a Hybrid Strike Engine powered by Shizuku to completely terminate the ad process and force-resume your music automatically. No root required.
 
-📦 Technical Specification: app-arm64-v8a-release.apk
-This is the optimized 64-bit production build of Blockify v1.0. Unlike the universal or debug builds, this APK is compiled using Ahead-of-Time (AOT) compilation specifically for the arm64-v8a instruction set, ensuring maximum execution speed and minimal memory overhead.
+🚀 Key Features
+Hybrid Strike Engine: Uses package-targeted media dispatch (cmd media_session) with a global hardware interrupt fallback (input keyevent 79) to guarantee your music resumes.
+Self-Healing Sensor: Defeats aggressive HyperOS background-killing by programmatically power-cycling the NotificationListenerService whenever the shield is armed.
+Nuke & Resume: Employs a calculated 10-second stabilization window to allow the Spotify UI thread to reload before sending the resume command, preventing system race conditions.
+Rootless Power: Uses Shizuku to execute ADB shell commands directly on the device locally and securely.
+Battery Optimized: The core service only runs when the "Master Toggle" is armed, leaving zero footprint when you aren't listening to music.
+⚙️ Prerequisites & Setup
+Blockify requires a few specific Android Developer Settings to perform its hardware-level interrupts.
 
-🛠 Architecture Overview
-The arm64-v8a (AArch64) architecture is the standard for modern mobile processors. By targeting this specifically, Blockify communicates directly with the 64-bit registers of chipsets like the Helio G85, reducing the abstraction layer and improving the response time of the Hybrid Strike Engine.
+1. The Engine (Shizuku)
+Blockify requires Shizuku to send system commands without root access.
 
-🚀 Key Performance Benefits
-Reduced Binary Size: At 18.7 MB, this build is nearly 85% smaller than the debug version. All non-essential debugging symbols and unused Material Icons have been "tree-shaken" to save storage.
+Download Shizuku from the Play Store.
+Start it via Wireless Debugging (You can turn Wireless Debugging off once Shizuku says "Running").
+Open Blockify and grant Shizuku permissions.
+2. The Core Settings (Developer Options)
+To allow the app to send the "Play/Pause" hardware signal, you must grant it permission.
 
-Faster Ad-Nuking: The Kotlin backend responsible for terminating ad processes runs with 64-bit precision, leading to faster process identification and "striking" than the 32-bit legacy version.
+Go to Settings > About Phone and tap your OS Version 7 times to unlock Developer Options.
+Go to Developer Options > Debugging.
+Toggle ON the "Simulate touch" permission (Often bundled under USB debugging (Security settings) on Xiaomi devices).
+📥 Installation
+Go to the Releases page.
+Download the latest app-arm64-v8a-release.apk (Recommended for modern devices like the Redmi 13C).
+Install the APK and follow the in-app User Manual to arm the shield.
+🛠️ Engineering Notes & Troubleshooting
+Why is there a 10-second delay after skipping?
+Analysis of chipsets like the Helio G85 showed significant UI thread latency during a cold start. The 10-second stabilization window ensures the Android MediaSession Registry is fully populated before the hardware interrupt is dispatched, guaranteeing a successful resume.
 
-Optimized Resource Management: This build is specifically tuned to resist the aggressive RAM management of HyperOS/MIUI, allowing the Self-Healing Sensor to remain resident in memory without being flagged as a "rogue" process.
+Why do I see two Blockify icons in my app drawer?
+On Xiaomi/HyperOS, the system's "Dual Apps" feature may attempt to clone the app into a Work Profile. Blockify is restricted to the Primary User (User 0) for stability. You can safely disable the second icon in Settings > Apps > Dual apps.
 
-🔋 Power Efficiency
-Because this APK is built using the --split-per-abi flag, it does not contain the code for older 32-bit (v7a) or desktop (x86) architectures. This results in:
+The app is running, but it's not detecting ads!
+HyperOS occasionally "blinds" background listeners to save RAM. Simply flip the Master Shield toggle OFF and then back ON. This triggers the Self-Healing Sensor to forcefully re-bind to the Android System Server.
 
-Faster Installation: Fewer files for the Android Package Manager to verify.
-
-Lower Battery Consumption: The CPU doesn't have to run in "32-bit compatibility mode," which is inherently less efficient.
-
-📝 Installation Guide
-Ensure Shizuku is active and authorized.
-
-Verify that "Simulate touch" is enabled in your Developer Options to allow this build to send the Hardware Interrupt 79 signal.
-
-Exclude this app from Battery Optimization (Set to "No Restrictions") to maintain the integrity of the persistent monitoring pipe.
-
-Note: This version is intended for all modern Android smartphones. If you are using a device older than 2016, you may need the armeabi-v7a legacy build instead.
